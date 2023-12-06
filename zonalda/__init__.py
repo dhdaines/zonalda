@@ -1,7 +1,7 @@
 """
 ZOnage AdéLois Démystifié pour les Adélois.e.s
 
-CLI/API pour géolocaliser zonage, districts, et autres choses
+Module pour géolocaliser zonage, districts, et autres choses
 """
 
 import argparse
