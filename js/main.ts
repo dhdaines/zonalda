@@ -1,4 +1,3 @@
-import "./style.css";
 import { Map, View } from "ol";
 import VectorSource from "ol/source/Vector.js";
 import { Tile as TileLayer, Vector as VectorLayer } from "ol/layer.js";

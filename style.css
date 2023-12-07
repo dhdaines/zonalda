@@ -1,5 +1,5 @@
-@import "../node_modules/ol/ol.css";
-@import "../node_modules/@geoapify/geocoder-autocomplete/styles/minimal.css";
+@import "node_modules/ol/ol.css";
+@import "node_modules/@geoapify/geocoder-autocomplete/styles/minimal.css";
 
 html, body {
     margin: 0;

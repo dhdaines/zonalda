@@ -5,5 +5,4 @@ ZONALDA.ipynb
 /venv
 __pycache__
 /node_modules
-src/config.ts
 .env
