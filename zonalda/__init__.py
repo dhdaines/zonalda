@@ -8,12 +8,16 @@ import argparse
 import logging
 from pathlib import Path
 
-import geopandas
-from shapely import Point
+import geopandas  # type: ignore
+from shapely import Point  # type: ignore
 
 VERSION = "0.0.1"
 THISDIR = Path(__file__).parent
 LOGGER = logging.getLogger("zonalda")
+
+
+class MunicipalityError(RuntimeError):
+    pass
 
 
 class Zonalda:
@@ -29,7 +33,9 @@ class Zonalda:
         """Chercher les informations citoyennes pour un emplacement."""
         p = Point(longitude, latitude)
         if not self.ville.geometry.contains(p):
-            raise RuntimeError("Emplacement %s ne se trouve pas à Sainte-Adèle" % p)
+            raise MunicipalityError(
+                "Emplacement %s ne se trouve pas à Sainte-Adèle" % p
+            )
         districts = self.districts.loc[self.districts.contains(p)]
         district = districts.iloc[0]
         zones = self.zonage.loc[self.zonage.contains(p)]
@@ -38,7 +44,9 @@ class Zonalda:
         zone = zones.iloc[0]
         collectes = self.collectes.loc[self.collectes.contains(p)]
         if len(collectes) > 1:
-            LOGGER.warning("Plusieurs ones de collectes trouvé pour %s: %s", p, collectes)
+            LOGGER.warning(
+                "Plusieurs ones de collectes trouvé pour %s: %s", p, collectes
+            )
         collecte = collectes.iloc[0]
         return district, zone, collecte
 
@@ -54,9 +62,11 @@ def main():
     latitude, longitude = args.geoloc.split(",")
     z = Zonalda()
     district, zone, collecte = z(latitude, longitude)
-    print(f"""Emplacement: {latitude},{longitude}
+    print(
+        f"""Emplacement: {latitude},{longitude}
 District: {district['id']}
 Conseiller: {district['Conseiller']}
 Jour de collecte: {collecte['jour']}
 Zone: {zone['ZONE']} ({zone['Types']} {zone['Descr_Type']})
-""")
+"""
+    )
