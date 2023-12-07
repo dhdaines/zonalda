@@ -1,0 +1,61 @@
+@import "../node_modules/ol/ol.css";
+@import "../node_modules/@geoapify/geocoder-autocomplete/styles/minimal.css";
+
+html, body {
+    margin: 0;
+    height: 100%;
+    font-family: sans-serif;
+}
+.container {
+    display: flex;
+    flex-flow: column;
+    justify-content: space-between;
+    height: 100%;
+}
+#header {
+    font-family: sans-serif;
+    text-align: center;
+    text-transform: uppercase;
+    padding: 0.5ex;
+    margin: 0;
+    background: #717;
+    color: #eee;
+}
+.initial {
+    color: #ee4;
+}
+#locate {
+    background-color: white;
+    font-size: 24px;
+    border: solid;
+    height: 38px;
+    width: 38px;
+    text-align: center;
+    margin-right: 2px;
+    color: rgba(0, 0, 0, 0.3);
+    border: 1px solid rgba(0, 0, 0, 0.3);
+}
+#geoloc {
+    flex-grow: 0;
+    display: flex;
+    flex-flow: row;
+    margin: 1em auto;
+    width: 100%;
+}
+#adresse {
+    flex: 1;
+    position: relative;
+}
+#info {
+    flex: 6em;
+    padding: 2px;
+    margin-bottom: 1em;
+}
+#map {
+    flex: 100%;
+}
+@media (max-width: 599px) {
+    .desktop {
+        display: none;
+    }
+}

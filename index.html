@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ZONALDA</title>
+    <link rel="stylesheet" href="/src/style.css">
+  </head>
+  <body>
+    <div class="container">
+      <h1 id="header">ZONALDA<span class="desktop">:
+          <span class="initial">ZON</span>age
+          <span class="initial">A</span>dé<span class="initial">L</span>ois
+          <span class="initial">D</span>émystifié pour les
+          <span class="initial">A</span>délois·e·s</span>
+      </h1>
+      <div id="geoloc">
+        <div>
+          <button id="locate" title="Géolocalisez-moi!">◎</button>
+        </div>
+        <div id="adresse" class="autocomplete-container"></div>
+      </div>
+      <div id="info">
+        <em>les informations apparaîtront ici...</em>
+      </div>
+      <div id="map">
+      </div>
+    </div>
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>
