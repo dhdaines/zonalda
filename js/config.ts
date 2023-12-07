@@ -4,4 +4,4 @@ export const COLLECTES_URL = "https://ville.sainte-adele.qc.ca/upload/documents/
 export const COLLECTE_ZONE_URL = {
   jaune: "https://lespaysdenhaut.com/wp-content/uploads/2023/07/SainteAdele_jaune2023-24.pdf",
   rose: "https://lespaysdenhaut.com/wp-content/uploads/2023/07/SainteAdele_rose-2023-24.pdf",
-}
+};

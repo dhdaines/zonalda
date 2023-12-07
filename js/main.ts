@@ -48,6 +48,7 @@ if (adresse == null)
 const autocomplete = new GeocoderAutocomplete(
   adresse,
   "APIKEY", {
+  debounceDelay: 250,
   lang: "fr",
   skipIcons: true,
   placeholder: "Chercher une adresse ou cliquez sur la carte...",
