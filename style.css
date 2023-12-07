@@ -51,12 +51,14 @@ html, body {
     padding: 2px;
 }
 #info table {
-    width: 100%;
+    width: calc(100% - 2em);
     margin: 0 1em 1em 1em;
 }
 #info table td:first-child {
     background: #eee;
-    max-width: 25%;
+}
+#info table td:first-child + td {
+    width: 75%;
 }
 #info table td {
     padding: 2px;

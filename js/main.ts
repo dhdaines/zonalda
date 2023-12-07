@@ -49,7 +49,6 @@ const autocomplete = new GeocoderAutocomplete(
   adresse,
   "APIKEY", {
   lang: "fr",
-  debounceDelay: 500,
   skipIcons: true,
   placeholder: "Chercher une adresse ou cliquez sur la carte...",
   filter: {
@@ -98,7 +97,7 @@ function collecteTexte(info) {
 }
 
 function conseilTexte(info) {
-  return `<a href="mailto:district${info.district}@vdsa.ca">${info.conseiller}</a>`;
+  return `<a href="mailto:district${info.numero}@vdsa.ca">${info.conseiller}</a>`;
 }
 
 const geoformat = new GeoJSON();
@@ -133,12 +132,7 @@ function infoError(txt: string) {
   const infoDiv = document.getElementById("info");
   if (infoDiv == null)
     throw "Element not found: info";
-  infoDiv.innerHTML = `<p>
-Les informations n’ont pu être trouvées pour l'endroit choisi à cause
-d'un problème avec la base géomatique.  Veuillez réessayer un autre
-endroit à proximité.
-</p>
-`;
+  infoDiv.innerHTML = `<p>${txt}</p>`;
 }
 
 async function getInfo(coords: GeoJSONPosition) {
@@ -149,8 +143,13 @@ async function getInfo(coords: GeoJSONPosition) {
     const info = await response.json();
     updateInfo(info);
   }
+  else if (response.status == 404) {
+    infoError(`L'endroit choisi ne se situe pas à Sainte-Adèle.  Veuillez réessayer.`);
+  }
   else {
-    infoError(response.statusText);
+    infoError(`Les informations n’ont pu être trouvées pour l'endroit choisi à cause
+d'un problème avec la base géomatique.  Veuillez réessayer un autre
+endroit à proximité.`);
   }
 }
 
