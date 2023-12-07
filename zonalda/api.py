@@ -5,17 +5,26 @@ API pour applications web
 """
 
 import json
+import logging
+import os
 
+import dotenv
+import httpx
 import shapely  # type: ignore
 from fastapi import FastAPI, HTTPException
-from fastapi.responses import PlainTextResponse
+from fastapi.responses import PlainTextResponse, JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 
 from . import Zonalda, MunicipalityError
 
+LOGGER = logging.getLogger("zonalda-api")
 zonalda = Zonalda()
 api = FastAPI()
+dotenv.load_dotenv()
+if "GEOAPIFY_API_KEY" not in os.environ:
+    raise RuntimeError("Veuillez définir GEOAPIFY_API_KEY dans .env ou l'environnement")
+logging.basicConfig(level=logging.INFO)
 
 
 class District(BaseModel):
@@ -61,17 +70,50 @@ async def municipality_error_handler(request, exc):
     return PlainTextResponse(str(exc), status_code=404)
 
 
-@api.get("/ll/{latitude},{longitude}")
+@api.get("/g/{latitude},{longitude}")
 async def ll(latitude: float, longitude: float):
     return Emplacement.from_wgs84(latitude, longitude)
 
 
-@api.get("/g/{gps}")
-async def gps(gps: str):
-    parts = [float(x) for x in gps.split(",")]
-    if len(parts) != 2:
-        raise HTTPException(status_code=404, detail=f"Invalid GPS coordinates {gps}")
-    return Emplacement.from_wgs84(*parts)
+GEOAPIFY_URL = "https://api.geoapify.com/v1/geocode/autocomplete"
+ADDRESS_CACHE = {}
+client = httpx.AsyncClient()
+
+
+@api.get("/geoloc")
+async def geoloc(
+    text: str,
+    apiKey: str,
+    type: str | None = None,
+    limit: str | None = None,
+    lang: str | None = None,
+    filter: str | None = None,
+    bias: str | None = None,
+):
+    if text in ADDRESS_CACHE:
+        LOGGER.info("Cache hit for '%s'", text)
+        return JSONResponse(ADDRESS_CACHE[text])
+    params = {
+        "text": text,
+        "apiKey": os.environ["GEOAPIFY_API_KEY"],
+    }
+    if type is not None:
+        params["type"] = type
+    if limit is not None:
+        params["limit"] = limit
+    if lang is not None:
+        params["lang"] = lang
+    if filter is not None:
+        params["filter"] = filter
+    if bias is not None:
+        params["bias"] = bias
+    r = await client.get(GEOAPIFY_URL, params=params)
+    if r.status_code != 200:
+        raise HTTPException(
+            status_code=r.status_code, detail="Échec de requête Geoapify"
+        )
+    ADDRESS_CACHE[text] = r.json()
+    return JSONResponse(ADDRESS_CACHE[text])
 
 
 app = FastAPI()
@@ -79,5 +121,5 @@ app.mount("/api", api)
 app.add_middleware(
     CORSMiddleware,
     allow_methods=["GET", "OPTIONS"],
-    allow_origin_regex="http://localhost(:.*)?",
+    allow_origin_regex="(http://localhost(:.*)?|https://zonalda.ecolingui.ca)",
 )

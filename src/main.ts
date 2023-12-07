@@ -4,7 +4,7 @@ import VectorSource from "ol/source/Vector.js";
 import { Tile as TileLayer, Vector as VectorLayer } from "ol/layer.js";
 import OSM from "ol/source/OSM";
 import { fromLonLat, toLonLat } from "ol/proj.js";
-import { ZONALDA_API_URL, GEOAPIFY_API_KEY } from "./config";
+import { ZONALDA_API_URL, ALEXI_URL } from "./config";
 import { GeocoderAutocomplete } from '@geoapify/geocoder-autocomplete';
 import { Feature as GeoJSONFeature, Point as GeoJSONPoint, Position as GeoJSONPosition } from "geojson";
 import { circular } from "ol/geom/Polygon";
@@ -48,7 +48,7 @@ if (adresse == null)
   throw "Element not found: adresse";
 const autocomplete = new GeocoderAutocomplete(
   adresse,
-  GEOAPIFY_API_KEY, {
+  "APIKEY", {
   lang: "fr",
   debounceDelay: 500,
   skipIcons: true,
@@ -56,37 +56,65 @@ const autocomplete = new GeocoderAutocomplete(
   filter: {
     rect: { lon1, lat1, lon2, lat2 }
   },
-});
+  });
+// @ts-ignore
+autocomplete.geocoderUrl = `${ZONALDA_API_URL}/geoloc`;
 
-const zonesource = new VectorSource<FeatureLike>();
-const zonelayer = new VectorLayer();
+function milieuTexte(info) {
+  const { zone, milieu, description } = info;
+  return `${milieu} (${description})`;
+}
+
 const geoformat = new GeoJSON();
+const zonesource = new VectorSource();
+const zonelayer = new VectorLayer<any>({  // stfu tsc
+  source: zonesource,
+});
 function updateInfo(info) {
   const infoDiv = document.getElementById("info");
   if (infoDiv == null)
     throw "Element not found: info";
-  const { zone, milieu, description, geometry } = info.zone;
-  infoDiv.innerHTML = `
-District: ${info.district.numero}<br>
-Conseiller: ${info.district.conseiller}<br>
-Zone: ${zone} (${milieu} ${description})<br>
-Jour de collecte: ${info.collecte.jour}<br>
-`;
-  /*
+  const { zone, district, collecte } = info;
+  infoDiv.innerHTML = `<table>
+<tr><td>District</td><td>${district.numero}<td></tr>
+<tr><td>Conseiller</td><td>${district.conseiller}<td></tr>
+<tr><td>Zone</td><td>${zone.zone}</td></tr>
+<tr><td>Milieu</td><td>${milieuTexte(info.zone)}<td></tr>
+<tr><td>Collecte</td><td>${collecte.jour}<td></tr>
+</table>`;
   zonesource.clear(true);
-  const feats = geoformat.readFeatures(geometry);
-  console.log(feats);
-  zonesource.addFeatures(feats);
-  */
+  zonesource.addFeature(new Feature(geoformat.readGeometry(zone.geometry, {
+    dataProjection: "EPSG:4326",
+    featureProjection: view.getProjection()
+  })));
+  view.fit(zonesource.getExtent(), {
+    maxZoom: 16,
+    duration: 500,
+  });
+}
+
+function infoError(txt: string) {
+  const infoDiv = document.getElementById("info");
+  if (infoDiv == null)
+    throw "Element not found: info";
+  infoDiv.innerHTML = `<p>
+Les informations n’ont pu être trouvées pour l'endroit choisi à cause
+d'un problème avec la base géomatique.  Veuillez réessayer un autre
+endroit à proximité.
+</p>
+`;
 }
 
 async function getInfo(coords: GeoJSONPosition) {
   const [lon, lat] = coords;
-  const url = `${ZONALDA_API_URL}/ll/${lat},${lon}`;
+  const url = `${ZONALDA_API_URL}/g/${lat},${lon}`;
   const response = await fetch(url);
   if (response.ok) {
     const info = await response.json();
     updateInfo(info);
+  }
+  else {
+    infoError(response.statusText);
   }
 }
 

@@ -47,14 +47,27 @@ html, body {
     position: relative;
 }
 #info {
-    flex: 6em;
+    flex: 15em;
     padding: 2px;
-    margin-bottom: 1em;
+}
+#info table {
+    width: 100%;
+    margin: 0 1em 1em 1em;
+}
+#info table td:first-child {
+    background: #eee;
+    max-width: 25%;
+}
+#info table td {
+    padding: 2px;
+}
+#info p {
+    padding: 0 1em 1em 1em;
 }
 #map {
     flex: 100%;
 }
-@media (max-width: 599px) {
+@media (max-width: 799px) {
     .desktop {
         display: none;
     }
