@@ -3,7 +3,7 @@ import VectorSource from "ol/source/Vector.js";
 import { Tile as TileLayer, Vector as VectorLayer } from "ol/layer.js";
 import OSM from "ol/source/OSM";
 import { fromLonLat, toLonLat } from "ol/proj.js";
-import { ZONALDA_API_URL, ALEXI_URL } from "./config";
+import { ZONALDA_API_URL, ALEXI_URL, COLLECTES_URL } from "./config";
 import { GeocoderAutocomplete } from '@geoapify/geocoder-autocomplete';
 import { Feature as GeoJSONFeature, Point as GeoJSONPoint, Position as GeoJSONPosition } from "geojson";
 import { circular } from "ol/geom/Polygon";
@@ -59,9 +59,46 @@ const autocomplete = new GeocoderAutocomplete(
 // @ts-ignore
 autocomplete.geocoderUrl = `${ZONALDA_API_URL}/geoloc`;
 
+let zonage = {
+  categorie_milieu: {},
+  milieu: {},
+}
+const response = await fetch(`${ALEXI_URL}/zonage.json`);
+if (response.ok) {
+  zonage = await response.json();
+}
+
+function categorieTexte(info) {
+  const { zone, milieu, description } = info;
+  const [categorie, souscategorie] = milieu.split(".");
+  const cat = zonage.categorie_milieu[categorie];
+  if (cat !== undefined) {
+    console.log(cat)
+    const { titre, url } = cat;
+    return `<a target="_blank" href="${ALEXI_URL}/${url}">${categorie} ${titre}</a>`;
+  }
+  else
+    return categorie;
+}
+
 function milieuTexte(info) {
   const { zone, milieu, description } = info;
-  return `${milieu} (${description})`;
+  const mil = zonage.milieu[milieu];
+  if (mil !== undefined) {
+    const { titre, url } = mil;
+    return `<a target="_blank" href="${ALEXI_URL}/${url}">${milieu} ${description}</a>`;
+  }
+  else
+    return `${milieu} ${description}\n`;
+}
+
+function collecteTexte(info) {
+  const { couleur, jour } = info;
+  return `${jour} <a target="_blank" href="${COLLECTES_URL}">(calendrier PDF)</a>`;
+}
+
+function conseilTexte(info) {
+  return `<a href="mailto:district${info.district}@vdsa.ca">${info.conseiller}</a>`;
 }
 
 const geoformat = new GeoJSON();
@@ -75,11 +112,11 @@ function updateInfo(info) {
     throw "Element not found: info";
   const { zone, district, collecte } = info;
   infoDiv.innerHTML = `<table>
-<tr><td>District</td><td>${district.numero}<td></tr>
-<tr><td>Conseiller</td><td>${district.conseiller}<td></tr>
+<tr><td>District</td><td>${district.numero}: ${conseilTexte(district)}<td></tr>
 <tr><td>Zone</td><td>${zone.zone}</td></tr>
-<tr><td>Milieu</td><td>${milieuTexte(info.zone)}<td></tr>
-<tr><td>Collecte</td><td>${collecte.jour}<td></tr>
+<tr><td>Catégorie</td><td>${categorieTexte(zone)}<td></tr>
+<tr><td>Milieu</td><td>${milieuTexte(zone)}<td></tr>
+<tr><td>Collecte</td><td>${collecteTexte(collecte)}<td></tr>
 </table>`;
   zonesource.clear(true);
   zonesource.addFeature(new Feature(geoformat.readGeometry(zone.geometry, {

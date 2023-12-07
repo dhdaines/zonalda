@@ -64,6 +64,10 @@ html, body {
 #info p {
     padding: 0 1em 1em 1em;
 }
+#info a {
+    text-decoration: none;
+    color: #717;
+}
 #map {
     flex: 100%;
 }
