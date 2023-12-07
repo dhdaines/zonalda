@@ -9,6 +9,7 @@ import json
 import shapely  # type: ignore
 from fastapi import FastAPI, HTTPException
 from fastapi.responses import PlainTextResponse
+from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 
 from . import Zonalda, MunicipalityError
@@ -75,3 +76,8 @@ async def gps(gps: str):
 
 app = FastAPI()
 app.mount("/api", api)
+app.add_middleware(
+    CORSMiddleware,
+    allow_methods=["GET", "OPTIONS"],
+    allow_origin_regex="http://localhost(:.*)?",
+)
