@@ -1,5 +1,5 @@
-ZONALDA: ZONage AdéLois Démystifié pour les Adélois·e·s
-=======================================================
+ZONALDA: ZONage AdéLois Démontré (aux Adélois·e·s)
+==================================================
 
 ZONALDA est constituée d'un API pour identifier la zone (ainsi
 qu'autre unités géographiques intéressantes) où se trouve un
