@@ -63,10 +63,13 @@ let zonage = {
   categorie_milieu: {},
   milieu: {},
 }
-const response = await fetch(`${ALEXI_URL}/zonage.json`);
-if (response.ok) {
-  zonage = await response.json();
-}
+
+window.addEventListener("load", async () => {
+  const response = await fetch(`${ALEXI_URL}/zonage.json`);
+  if (response.ok) {
+    zonage = await response.json();
+  }
+});
 
 function categorieTexte(info) {
   const { zone, milieu, description } = info;
