@@ -118,8 +118,24 @@ async def geoloc(
 
 app = FastAPI()
 app.mount("/api", api)
+middleware_args: dict[str, str | list[str]]
+if os.getenv("DEVELOPMENT", False):
+    LOGGER.info(
+        "Running in development mode, will allow requests from http://localhost:*"
+    )
+    # Allow requests from localhost dev servers
+    middleware_args = dict(
+        allow_origin_regex="http://localhost(:.*)?",
+    )
+else:
+    # Allow requests *only* from ZONALDA app (or otherwise configured site name)
+    middleware_args = dict(
+        allow_origins=[
+            os.getenv("ORIGIN", "https://dhdaines.github.io/zonalda"),
+        ],
+    )
 app.add_middleware(
     CORSMiddleware,
     allow_methods=["GET", "OPTIONS"],
-    allow_origin_regex="(http://localhost(:.*)?|https://zonalda.ecolingui.ca)",
+    **middleware_args
 )
