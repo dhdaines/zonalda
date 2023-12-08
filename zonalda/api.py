@@ -54,10 +54,10 @@ class Emplacement(BaseModel):
         district, zone, collecte = zonalda(latitude, longitude)
         return self(
             district=District(numero=district["id"], conseiller=district["Conseiller"])
-            if district
+            if district is not None
             else None,
             collecte=Collecte(jour=collecte["jour"], couleur=collecte["couleur"])
-            if collecte
+            if collecte is not None
             else None,
             zone=Zone(
                 zone=zone["ZONE"],
@@ -66,7 +66,7 @@ class Emplacement(BaseModel):
                 # FIXME: thoroughly unnecessary JSON parsing
                 geometry=json.loads(shapely.to_geojson(zone["geometry"])),
             )
-            if zone
+            if zone is not None
             else None,
         )
 

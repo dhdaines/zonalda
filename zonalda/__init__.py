@@ -9,6 +9,7 @@ import logging
 from pathlib import Path
 
 import geopandas  # type: ignore
+from pandas import Series
 from shapely import Point  # type: ignore
 
 VERSION = "0.0.1"
@@ -29,7 +30,9 @@ class Zonalda:
         self.zonage = geopandas.read_file(THISDIR / "zonage.geojson")
         self.collectes = geopandas.read_file(THISDIR / "collectes.geojson")
 
-    def __call__(self, latitude: float, longitude: float):
+    def __call__(
+        self, latitude: float, longitude: float
+    ) -> tuple[Series | None, Series | None, Series | None,]:
         """Chercher les informations citoyennes pour un emplacement."""
         p = Point(longitude, latitude)
         if not self.ville.geometry.contains(p):
@@ -40,19 +43,19 @@ class Zonalda:
         districts = self.districts.loc[self.districts.contains(p)]
         if len(districts) > 1:
             LOGGER.warning("Plusieurs districts trouvé pour %s: %s", p, districts)
-        if districts:
+        if len(districts):
             district = districts.iloc[0]
         zones = self.zonage.loc[self.zonage.contains(p)]
         if len(zones) > 1:
             LOGGER.warning("Plusieurs zones trouvé pour %s: %s", p, zones)
-        if zones:
+        if len(zones):
             zone = zones.iloc[0]
         collectes = self.collectes.loc[self.collectes.contains(p)]
         if len(collectes) > 1:
             LOGGER.warning(
                 "Plusieurs zones de collectes trouvé pour %s: %s", p, collectes
             )
-        if collectes:
+        if len(collectes):
             collecte = collectes.iloc[0]
         return district, zone, collecte
 

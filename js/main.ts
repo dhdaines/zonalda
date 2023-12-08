@@ -43,7 +43,7 @@ function getCurrentPosition(): Promise<GeolocationPosition> {
 
 const [lon1, lat1, lon2, lat2] = sainteAdeleBBox;
 const adresse = document.getElementById("adresse");
-if (adresse == null)
+if (adresse === null)
   throw "Element not found: adresse";
 const autocomplete = new GeocoderAutocomplete(
   adresse,
@@ -72,6 +72,8 @@ window.addEventListener("load", async () => {
 });
 
 function categorieTexte(info) {
+  if (info === null)
+    return "inconnu";
   const { zone, milieu, description } = info;
   const [categorie, souscategorie] = milieu.split(".");
   const cat = zonage.categorie_milieu[categorie];
@@ -85,6 +87,8 @@ function categorieTexte(info) {
 }
 
 function milieuTexte(info) {
+  if (info === null)
+    return "inconnu";
   const { zone, milieu, description } = info;
   const mil = zonage.milieu[milieu];
   if (mil !== undefined) {
@@ -96,12 +100,16 @@ function milieuTexte(info) {
 }
 
 function collecteTexte(info) {
+  if (info === null)
+    return "inconnue";
   const { couleur, jour } = info;
   return `${jour} <a target="_blank" href="${COLLECTES_URL}">(calendrier PDF)</a>`;
 }
 
 function conseilTexte(info) {
-  return `<a href="mailto:district${info.numero}@vdsa.ca">${info.conseiller}</a>`;
+  if (info === null)
+    return "inconnu";
+  return `conseillier: <a href="mailto:district${info.numero}@vdsa.ca">${info.conseiller}</a>`;
 }
 
 const geoformat = new GeoJSON();
@@ -111,12 +119,12 @@ const zonelayer = new VectorLayer<any>({  // stfu tsc
 });
 function updateInfo(info) {
   const infoDiv = document.getElementById("info");
-  if (infoDiv == null)
+  if (infoDiv === null)
     throw "Element not found: info";
   const { zone, district, collecte } = info;
   infoDiv.innerHTML = `<table>
-<tr><td>District</td><td>${district.numero}: ${conseilTexte(district)}<td></tr>
-<tr><td>Zone</td><td>${zone.zone}</td></tr>
+<tr><td>District</td><td>${district.numero} (${conseilTexte(district)})<td></tr>
+<tr><td>Zone</td><td>${zone.zone ?? "inconnue"}</td></tr>
 <tr><td>Catégorie</td><td>${categorieTexte(zone)}<td></tr>
 <tr><td>Milieu</td><td>${milieuTexte(zone)}<td></tr>
 <tr><td>Collecte</td><td>${collecteTexte(collecte)}<td></tr>
@@ -134,7 +142,7 @@ function updateInfo(info) {
 
 function infoError(txt: string) {
   const infoDiv = document.getElementById("info");
-  if (infoDiv == null)
+  if (infoDiv === null)
     throw "Element not found: info";
   infoDiv.innerHTML = `<p>${txt}</p>`;
 }
@@ -182,7 +190,7 @@ async function geolocateMe() {
 }
 
 const locate = document.getElementById("locate");
-if (locate == null)
+if (locate === null)
   throw "Element not found: locate";
 locate.addEventListener("click", geolocateMe);
 
