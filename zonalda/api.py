@@ -131,7 +131,7 @@ else:
     # Allow requests *only* from ZONALDA app (or otherwise configured site name)
     middleware_args = dict(
         allow_origins=[
-            os.getenv("ORIGIN", "https://dhdaines.github.io/zonalda"),
+            os.getenv("ORIGIN", "https://dhdaines.github.io"),
         ],
     )
 app.add_middleware(
