@@ -12,11 +12,11 @@ import dotenv
 import httpx
 import shapely  # type: ignore
 from fastapi import FastAPI, HTTPException
-from fastapi.responses import PlainTextResponse, JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse, PlainTextResponse
 from pydantic import BaseModel
 
-from . import Zonalda, MunicipalityError
+from . import MunicipalityError, Zonalda
 
 LOGGER = logging.getLogger("zonalda-api")
 zonalda = Zonalda()
@@ -45,23 +45,29 @@ class Zone(BaseModel):
 
 
 class Emplacement(BaseModel):
-    district: District
-    collecte: Collecte
-    zone: Zone
+    district: District | None
+    collecte: Collecte | None
+    zone: Zone | None
 
     @classmethod
     def from_wgs84(self, latitude: float, longitude: float) -> "Emplacement":
         district, zone, collecte = zonalda(latitude, longitude)
         return self(
-            district=District(numero=district["id"], conseiller=district["Conseiller"]),
-            collecte=Collecte(jour=collecte["jour"], couleur=collecte["couleur"]),
+            district=District(numero=district["id"], conseiller=district["Conseiller"])
+            if district
+            else None,
+            collecte=Collecte(jour=collecte["jour"], couleur=collecte["couleur"])
+            if collecte
+            else None,
             zone=Zone(
                 zone=zone["ZONE"],
                 milieu=zone["Types"],
                 description=zone["Descr_Type"],
                 # FIXME: thoroughly unnecessary JSON parsing
                 geometry=json.loads(shapely.to_geojson(zone["geometry"])),
-            ),
+            )
+            if zone
+            else None,
         )
 
 
@@ -76,7 +82,7 @@ async def ll(latitude: float, longitude: float):
 
 
 GEOAPIFY_URL = "https://api.geoapify.com/v1/geocode/autocomplete"
-ADDRESS_CACHE = {}
+ADDRESS_CACHE: dict[str, dict] = {}
 client = httpx.AsyncClient()
 
 
@@ -134,8 +140,4 @@ else:
             os.getenv("ORIGIN", "https://dhdaines.github.io"),
         ],
     )
-app.add_middleware(
-    CORSMiddleware,
-    allow_methods=["GET", "OPTIONS"],
-    **middleware_args
-)
+app.add_middleware(CORSMiddleware, allow_methods=["GET", "OPTIONS"], **middleware_args)

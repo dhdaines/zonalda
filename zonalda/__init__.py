@@ -36,18 +36,24 @@ class Zonalda:
             raise MunicipalityError(
                 "Emplacement %s ne se trouve pas à Sainte-Adèle" % p
             )
+        district, zone, collecte = None, None, None
         districts = self.districts.loc[self.districts.contains(p)]
-        district = districts.iloc[0]
+        if len(districts) > 1:
+            LOGGER.warning("Plusieurs districts trouvé pour %s: %s", p, districts)
+        if districts:
+            district = districts.iloc[0]
         zones = self.zonage.loc[self.zonage.contains(p)]
         if len(zones) > 1:
             LOGGER.warning("Plusieurs zones trouvé pour %s: %s", p, zones)
-        zone = zones.iloc[0]
+        if zones:
+            zone = zones.iloc[0]
         collectes = self.collectes.loc[self.collectes.contains(p)]
         if len(collectes) > 1:
             LOGGER.warning(
-                "Plusieurs ones de collectes trouvé pour %s: %s", p, collectes
+                "Plusieurs zones de collectes trouvé pour %s: %s", p, collectes
             )
-        collecte = collectes.iloc[0]
+        if collectes:
+            collecte = collectes.iloc[0]
         return district, zone, collecte
 
 
