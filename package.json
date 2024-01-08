@@ -8,7 +8,7 @@
   },
   "devDependencies": {
     "typescript": "^5.3.3",
-    "vite": "^5.0.7"
+    "vite": "^5.0.11"
   },
   "dependencies": {
     "@geoapify/geocoder-autocomplete": "^2.0.1",
