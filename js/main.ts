@@ -21,6 +21,7 @@ const source = new VectorSource<Feature>({
   features: [
     new Feature(new Point(fromLonLat(sainteAdeleLonLat))),
   ],
+  attributions: `Géomatique: <a target="_blank" href="https://lespaysdenhaut.com/">MRC des Pays-d'en-haut</a>`,
 }
 );
 const geoloc = new VectorLayer({
