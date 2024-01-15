@@ -82,7 +82,6 @@ async def ll(latitude: float, longitude: float):
 
 
 GEOAPIFY_URL = "https://api.geoapify.com/v1/geocode/autocomplete"
-ADDRESS_CACHE: dict[str, dict] = {}
 client = httpx.AsyncClient()
 
 
@@ -96,9 +95,6 @@ async def geoloc(
     filter: str | None = None,
     bias: str | None = None,
 ):
-    if text in ADDRESS_CACHE:
-        LOGGER.info("Cache hit for '%s'", text)
-        return JSONResponse(ADDRESS_CACHE[text])
     params = {
         "text": text,
         "apiKey": os.environ["GEOAPIFY_API_KEY"],
@@ -118,8 +114,7 @@ async def geoloc(
         raise HTTPException(
             status_code=r.status_code, detail="Échec de requête Geoapify"
         )
-    ADDRESS_CACHE[text] = r.json()
-    return JSONResponse(ADDRESS_CACHE[text])
+    return JSONResponse(r.json())
 
 
 app = FastAPI()
