@@ -133,7 +133,7 @@ function updateInfo(info, coords) {
     duration: 500,
   });
   const [lon, lat] = coords;
-  history.replaceState(null, "", "?g=" + encodeURICompoenent(`${lat},${lon}`));
+  history.replaceState(null, "", "?g=" + encodeURIComponent(`${lat},${lon}`));
 }
 
 function infoError(txt: string) {
@@ -208,7 +208,8 @@ map.on("click", async (evt) => {
 window.addEventListener("load", async () => {
   const response = await fetch(`${ALEXI_URL}/index.json`);
   if (response.ok) {
-    zonage = await response.json();
+    const metadata = await response.json();
+    zonage = metadata.zonage;
   }
   const urlParams = new URLSearchParams(window.location.search);
   const centroid = urlParams.get("g");
@@ -216,6 +217,7 @@ window.addEventListener("load", async () => {
     const [lat, lon] = centroid.split(",").map(parseFloat);
     const coords = [lon, lat];
     const projPos = fromLonLat(coords);
+    source.addFeature(new Feature(new Point(projPos)));
     view.animate({center: projPos});
     getInfo(coords);
   }
