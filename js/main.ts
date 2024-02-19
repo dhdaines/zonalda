@@ -65,13 +65,6 @@ let zonage = {
   milieu: {},
 }
 
-window.addEventListener("load", async () => {
-  const response = await fetch(`${ALEXI_URL}/index.json`);
-  if (response.ok) {
-    zonage = await response.json();
-  }
-});
-
 function categorieTexte(info) {
   if (info === null)
     return "inconnu";
@@ -118,7 +111,7 @@ const zonesource = new VectorSource();
 const zonelayer = new VectorLayer<any>({  // stfu tsc
   source: zonesource,
 });
-function updateInfo(info) {
+function updateInfo(info, coords) {
   const infoDiv = document.getElementById("info");
   if (infoDiv === null)
     throw "Element not found: info";
@@ -139,6 +132,8 @@ function updateInfo(info) {
     maxZoom: 16,
     duration: 500,
   });
+  const [lon, lat] = coords;
+  history.replaceState(null, "", "?g=" + encodeURICompoenent(`${lat},${lon}`));
 }
 
 function infoError(txt: string) {
@@ -154,7 +149,7 @@ async function getInfo(coords: GeoJSONPosition) {
   const response = await fetch(url);
   if (response.ok) {
     const info = await response.json();
-    updateInfo(info);
+    updateInfo(info, coords);
   }
   else if (response.status == 404) {
     infoError(`L'endroit choisi ne se situe pas à Sainte-Adèle.  Veuillez réessayer.`);
@@ -208,4 +203,20 @@ map.on("click", async (evt) => {
   autocomplete.setValue("");
   const coords = toLonLat(evt.coordinate);
   getInfo(coords);
+});
+
+window.addEventListener("load", async () => {
+  const response = await fetch(`${ALEXI_URL}/index.json`);
+  if (response.ok) {
+    zonage = await response.json();
+  }
+  const urlParams = new URLSearchParams(window.location.search);
+  const centroid = urlParams.get("g");
+  if (centroid !== null) {
+    const [lat, lon] = centroid.split(",").map(parseFloat);
+    const coords = [lon, lat];
+    const projPos = fromLonLat(coords);
+    view.animate({center: projPos});
+    getInfo(coords);
+  }
 });
