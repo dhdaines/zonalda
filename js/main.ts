@@ -66,7 +66,7 @@ let zonage = {
 }
 
 window.addEventListener("load", async () => {
-  const response = await fetch(`${ALEXI_URL}/zonage.json`);
+  const response = await fetch(`${ALEXI_URL}/index.json`);
   if (response.ok) {
     zonage = await response.json();
   }
