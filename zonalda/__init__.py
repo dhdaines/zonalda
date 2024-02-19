@@ -12,7 +12,7 @@ import geopandas  # type: ignore
 from pandas import Series
 from shapely import Point  # type: ignore
 
-VERSION = "0.0.1"
+VERSION = "0.0.2"
 THISDIR = Path(__file__).parent
 LOGGER = logging.getLogger("zonalda")
 
@@ -27,12 +27,23 @@ class Zonalda:
     def __init__(self):
         self.ville = geopandas.read_file(THISDIR / "sainte-adele.geojson").iloc[0]
         self.districts = geopandas.read_file(THISDIR / "districts.geojson")
-        self.zonage = geopandas.read_file(THISDIR / "zonage.geojson")
+        zonage = geopandas.read_file(THISDIR / "zonage.geojson")
+        self.zonage = zonage.assign(ZONE=zonage["ZONE"].str.replace(" ", ""))
         self.collectes = geopandas.read_file(THISDIR / "collectes.geojson")
 
-    def __call__(
-        self, latitude: float, longitude: float
-    ) -> tuple[Series | None, Series | None, Series | None,]:
+    def __getitem__(self, name: str) -> tuple[float, float]:
+        """Trouver le centroïde d'une zone par son nom."""
+        zones = self.zonage.loc[self.zonage["ZONE"] == name]
+        if zones.empty:
+            raise KeyError("Zone not found: %s" % name)
+        c = zones.iloc[0].geometry.centroid
+        return c.y, c.x
+
+    def __call__(self, latitude: float, longitude: float) -> tuple[
+        Series | None,
+        Series | None,
+        Series | None,
+    ]:
         """Chercher les informations citoyennes pour un emplacement."""
         p = Point(longitude, latitude)
         if not self.ville.geometry.contains(p):

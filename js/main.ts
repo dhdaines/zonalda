@@ -132,8 +132,6 @@ function updateInfo(info, coords) {
     maxZoom: 16,
     duration: 500,
   });
-  const [lon, lat] = coords;
-  history.replaceState(null, "", "?g=" + encodeURIComponent(`${lat},${lon}`));
 }
 
 function infoError(txt: string) {
@@ -150,6 +148,7 @@ async function getInfo(coords: GeoJSONPosition) {
   if (response.ok) {
     const info = await response.json();
     updateInfo(info, coords);
+    history.replaceState(null, "", "?g=" + encodeURIComponent(`${lat},${lon}`));
   }
   else if (response.status == 404) {
     infoError(`L'endroit choisi ne se situe pas à Sainte-Adèle.  Veuillez réessayer.`);
@@ -158,6 +157,24 @@ async function getInfo(coords: GeoJSONPosition) {
     infoError(`Les informations n’ont pu être trouvées pour l'endroit choisi à cause
 d'un problème avec la base géomatique.  Veuillez réessayer un autre
 endroit à proximité.`);
+  }
+}
+
+async function getZone(zone: string) {
+  const url = `${ZONALDA_API_URL}/z/${zone}`;
+  const response = await fetch(url);
+  if (response.ok) {
+    const info = await response.json();
+    updateInfo(info, info.point);
+    history.replaceState(null, "", "?z=" + encodeURIComponent(zone))
+    return info.point;
+  }
+  else if (response.status == 404) {
+    infoError(`La zone ${zone} n'existe pas.  Veuillez réessayer.`);
+  }
+  else {
+    infoError(`Les informations n’ont pu être trouvées pour l'endroit choisi à cause
+d'un problème avec la base géomatique.`);
   }
 }
 
@@ -212,13 +229,22 @@ window.addEventListener("load", async () => {
     zonage = metadata.zonage;
   }
   const urlParams = new URLSearchParams(window.location.search);
-  const centroid = urlParams.get("g");
+  let centroid = null;
+  const gps = urlParams.get("g");
+  const zone = urlParams.get("z");
+  if (gps !== null) {
+    const [lat, lon] = gps.split(",").map(parseFloat);
+    centroid = [lon, lat];
+    getInfo(centroid);
+  }
+  else if (zone !== null) {
+    centroid = await getZone(zone);
+    console.log(centroid);
+  }
   if (centroid !== null) {
-    const [lat, lon] = centroid.split(",").map(parseFloat);
-    const coords = [lon, lat];
-    const projPos = fromLonLat(coords);
+    const projPos = fromLonLat(centroid);
+    source.clear(true);
     source.addFeature(new Feature(new Point(projPos)));
     view.animate({center: projPos});
-    getInfo(coords);
   }
 });
