@@ -19,7 +19,7 @@
   "homepage": "https://github.com/dhdaines/zonalda#readme",
   "devDependencies": {
     "typescript": "^5.4.3",
-    "vite": "^5.2.7"
+    "vite": "^5.2.8"
   },
   "dependencies": {
     "@geoapify/geocoder-autocomplete": "^2.0.1",
