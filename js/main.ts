@@ -3,7 +3,7 @@ import VectorSource from "ol/source/Vector.js";
 import { Tile as TileLayer, Vector as VectorLayer } from "ol/layer.js";
 import OSM from "ol/source/OSM";
 import { fromLonLat, toLonLat } from "ol/proj.js";
-import { ZONALDA_API_URL, ALEXI_URL, COLLECTES_URL } from "./config";
+import { ZONALDA_API_URL, ALEXI_URL, COLLECTES_URL, COLLECTE_ZONE_URL } from "./config";
 import { GeocoderAutocomplete } from '@geoapify/geocoder-autocomplete';
 import { Feature as GeoJSONFeature, Point as GeoJSONPoint, Position as GeoJSONPosition } from "geojson";
 import { circular } from "ol/geom/Polygon";
@@ -104,7 +104,10 @@ function collecteTexte(info) {
   if (info === null)
     return "inconnue";
   const { couleur, jour } = info;
-  return `${jour} <a target="_blank" href="${COLLECTES_URL}">(calendrier PDF)</a>`;
+  if (couleur in COLLECTE_ZONE_URL)
+    return `${jour} (zone ${couleur}) <a href="${COLLECTE_ZONE_URL[couleur]}">(calendrier PDF)</a>`;
+  else
+    return `${jour} <a target="_blank" href="${COLLECTES_URL}">(calendrier PDF)</a>`;
 }
 
 function conseilTexte(info) {
