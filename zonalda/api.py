@@ -48,9 +48,13 @@ class Emplacement(BaseModel):
     district: District | None
     collecte: Collecte | None
     zone: Zone | None
+    point: tuple[float, float]
 
     @classmethod
     def from_wgs84(self, latitude: float, longitude: float) -> "Emplacement":
+        """
+        Chercher les informations géomatiques pour un emplacement GPS.
+        """
         district, zone, collecte = zonalda(latitude, longitude)
         return self(
             district=District(numero=district["id"], conseiller=district["Conseiller"])
@@ -68,7 +72,16 @@ class Emplacement(BaseModel):
             )
             if zone is not None
             else None,
+            point=(longitude, latitude),
         )
+
+    @classmethod
+    def from_zone(self, zone: str) -> "Emplacement":
+        """
+        Localiser le centroïde d'une zone et retourner les autres informations.
+        """
+        latitude, longitude = zonalda[zone]
+        return self.from_wgs84(latitude, longitude)
 
 
 @api.exception_handler(MunicipalityError)
@@ -81,8 +94,15 @@ async def ll(latitude: float, longitude: float):
     return Emplacement.from_wgs84(latitude, longitude)
 
 
+@api.get("/z/{zone}")
+async def zz(zone: str):
+    try:
+        return Emplacement.from_zone(zone)
+    except KeyError:
+        return None
+
+
 GEOAPIFY_URL = "https://api.geoapify.com/v1/geocode/autocomplete"
-ADDRESS_CACHE: dict[str, dict] = {}
 client = httpx.AsyncClient()
 
 
@@ -96,9 +116,6 @@ async def geoloc(
     filter: str | None = None,
     bias: str | None = None,
 ):
-    if text in ADDRESS_CACHE:
-        LOGGER.info("Cache hit for '%s'", text)
-        return JSONResponse(ADDRESS_CACHE[text])
     params = {
         "text": text,
         "apiKey": os.environ["GEOAPIFY_API_KEY"],
@@ -118,8 +135,7 @@ async def geoloc(
         raise HTTPException(
             status_code=r.status_code, detail="Échec de requête Geoapify"
         )
-    ADDRESS_CACHE[text] = r.json()
-    return JSONResponse(ADDRESS_CACHE[text])
+    return JSONResponse(r.json())
 
 
 app = FastAPI()

@@ -1,18 +1,29 @@
 {
   "name": "zonalda",
-  "version": "0.0.1",
+  "version": "0.0.2",
+  "description": "ZOnage AdéLois Démontré aux Adélois.e.s",
   "scripts": {
     "start": "vite",
     "build": "vite build",
     "serve": "vite preview"
   },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/dhdaines/zonalda.git"
+  },
+  "author": "David Huggins-Daines <district6@vdsa.ca>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/dhdaines/zonalda/issues"
+  },
+  "homepage": "https://github.com/dhdaines/zonalda#readme",
   "devDependencies": {
-    "typescript": "^5.3.3",
-    "vite": "^5.0.11"
+    "typescript": "^5.4.3",
+    "vite": "^5.2.7"
   },
   "dependencies": {
     "@geoapify/geocoder-autocomplete": "^2.0.1",
-    "@types/geojson": "^7946.0.13",
+    "@types/geojson": "^7946.0.14",
     "ol": "latest"
   }
 }

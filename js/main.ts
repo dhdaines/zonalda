@@ -65,13 +65,6 @@ let zonage = {
   milieu: {},
 }
 
-window.addEventListener("load", async () => {
-  const response = await fetch(`${ALEXI_URL}/zonage.json`);
-  if (response.ok) {
-    zonage = await response.json();
-  }
-});
-
 function categorieTexte(info) {
   if (info === null)
     return "inconnu";
@@ -121,7 +114,7 @@ const zonesource = new VectorSource();
 const zonelayer = new VectorLayer<any>({  // stfu tsc
   source: zonesource,
 });
-function updateInfo(info) {
+function updateInfo(info, coords) {
   const infoDiv = document.getElementById("info");
   if (infoDiv === null)
     throw "Element not found: info";
@@ -157,7 +150,8 @@ async function getInfo(coords: GeoJSONPosition) {
   const response = await fetch(url);
   if (response.ok) {
     const info = await response.json();
-    updateInfo(info);
+    updateInfo(info, coords);
+    history.replaceState(null, "", "?g=" + encodeURIComponent(`${lat},${lon}`));
   }
   else if (response.status == 404) {
     infoError(`L'endroit choisi ne se situe pas à Sainte-Adèle.  Veuillez réessayer.`);
@@ -166,6 +160,24 @@ async function getInfo(coords: GeoJSONPosition) {
     infoError(`Les informations n’ont pu être trouvées pour l'endroit choisi à cause
 d'un problème avec la base géomatique.  Veuillez réessayer un autre
 endroit à proximité.`);
+  }
+}
+
+async function getZone(zone: string) {
+  const url = `${ZONALDA_API_URL}/z/${zone}`;
+  const response = await fetch(url);
+  if (response.ok) {
+    const info = await response.json();
+    updateInfo(info, info.point);
+    history.replaceState(null, "", "?z=" + encodeURIComponent(zone))
+    return info.point;
+  }
+  else if (response.status == 404) {
+    infoError(`La zone ${zone} n'existe pas.  Veuillez réessayer.`);
+  }
+  else {
+    infoError(`Les informations n’ont pu être trouvées pour l'endroit choisi à cause
+d'un problème avec la base géomatique.`);
   }
 }
 
@@ -211,4 +223,31 @@ map.on("click", async (evt) => {
   autocomplete.setValue("");
   const coords = toLonLat(evt.coordinate);
   getInfo(coords);
+});
+
+window.addEventListener("load", async () => {
+  const response = await fetch(`${ALEXI_URL}/index.json`);
+  if (response.ok) {
+    const metadata = await response.json();
+    zonage = metadata.zonage;
+  }
+  const urlParams = new URLSearchParams(window.location.search);
+  let centroid = null;
+  const gps = urlParams.get("g");
+  const zone = urlParams.get("z");
+  if (gps !== null) {
+    const [lat, lon] = gps.split(",").map(parseFloat);
+    centroid = [lon, lat];
+    getInfo(centroid);
+  }
+  else if (zone !== null) {
+    centroid = await getZone(zone);
+    console.log(centroid);
+  }
+  if (centroid !== null) {
+    const projPos = fromLonLat(centroid);
+    source.clear(true);
+    source.addFeature(new Feature(new Point(projPos)));
+    view.animate({center: projPos});
+  }
 });
