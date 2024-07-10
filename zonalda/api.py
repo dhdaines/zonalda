@@ -51,12 +51,12 @@ class Emplacement(BaseModel):
     point: tuple[float, float]
 
     @classmethod
-    def from_wgs84(self, latitude: float, longitude: float) -> "Emplacement":
+    def from_wgs84(cls, latitude: float, longitude: float) -> "Emplacement":
         """
         Chercher les informations géomatiques pour un emplacement GPS.
         """
         district, zone, collecte = zonalda(latitude, longitude)
-        return self(
+        return cls(
             district=District(numero=district["id"], conseiller=district["Conseiller"])
             if district is not None
             else None,
@@ -76,12 +76,31 @@ class Emplacement(BaseModel):
         )
 
     @classmethod
-    def from_zone(self, zone: str) -> "Emplacement":
+    def from_zone(cls, zone: str) -> "Emplacement":
+        """Localiser le centroïde d'une zone et retourner les autres informations.
+
+        Notez que le centroïde d'une zone peut très bien ne pas se
+        trouver dans la zone elle-même!
         """
-        Localiser le centroïde d'une zone et retourner les autres informations.
-        """
-        latitude, longitude = zonalda[zone]
-        return self.from_wgs84(latitude, longitude)
+        district, zone, collecte = zonalda[zone]
+        return cls(
+            district=District(numero=district["id"], conseiller=district["Conseiller"])
+            if district is not None
+            else None,
+            collecte=Collecte(jour=collecte["jour"], couleur=collecte["couleur"])
+            if collecte is not None
+            else None,
+            zone=Zone(
+                zone=zone["ZONE"],
+                milieu=zone["Types"],
+                description=zone["Descr_Type"],
+                # FIXME: thoroughly unnecessary JSON parsing
+                geometry=json.loads(shapely.to_geojson(zone["geometry"])),
+            )
+            if zone is not None
+            else None,
+            point=(zone.geometry.centroid.x, zone.geometry.centroid.y),
+        )
 
 
 @api.exception_handler(MunicipalityError)
