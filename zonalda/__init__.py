@@ -43,11 +43,15 @@ class Zonalda:
         zone = zones.iloc[0]
         district, collecte = None, None
         districts = self.districts.loc[self.districts.contains(zone.geometry)]
+        if len(districts) == 0:
+            districts = self.districts.loc[self.districts.intersects(zone.geometry)]
         if len(districts) > 1:
             LOGGER.warning("Plusieurs districts trouvé pour %s: %s", name, districts)
         if len(districts):
             district = districts.iloc[0]
         collectes = self.collectes.loc[self.collectes.contains(zone.geometry)]
+        if len(collectes) == 0:
+            collectes = self.collectes.loc[self.collectes.intersects(zone.geometry)]
         if len(collectes) > 1:
             LOGGER.warning(
                 "Plusieurs zones de collectes trouvé pour %s: %s", name, collectes
