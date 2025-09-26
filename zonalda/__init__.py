@@ -31,13 +31,34 @@ class Zonalda:
         self.zonage = zonage.assign(ZONE=zonage["ZONE"].str.replace(" ", ""))
         self.collectes = geopandas.read_file(THISDIR / "collectes.geojson")
 
-    def __getitem__(self, name: str) -> tuple[float, float]:
-        """Trouver le centroïde d'une zone par son nom."""
+    def __getitem__(self, name: str) -> tuple[
+        Series | None,
+        Series | None,
+        Series | None,
+    ]:
+        """Trouver les informations pour une zone."""
         zones = self.zonage.loc[self.zonage["ZONE"] == name]
         if zones.empty:
             raise KeyError("Zone not found: %s" % name)
-        c = zones.iloc[0].geometry.centroid
-        return c.y, c.x
+        zone = zones.iloc[0]
+        district, collecte = None, None
+        districts = self.districts.loc[self.districts.contains(zone.geometry)]
+        if len(districts) == 0:
+            districts = self.districts.loc[self.districts.intersects(zone.geometry)]
+        if len(districts) > 1:
+            LOGGER.warning("Plusieurs districts trouvé pour %s: %s", name, districts)
+        if len(districts):
+            district = districts.iloc[0]
+        collectes = self.collectes.loc[self.collectes.contains(zone.geometry)]
+        if len(collectes) == 0:
+            collectes = self.collectes.loc[self.collectes.intersects(zone.geometry)]
+        if len(collectes) > 1:
+            LOGGER.warning(
+                "Plusieurs zones de collectes trouvé pour %s: %s", name, collectes
+            )
+        if len(collectes):
+            collecte = collectes.iloc[0]
+        return district, zone, collecte
 
     def __call__(self, latitude: float, longitude: float) -> tuple[
         Series | None,
