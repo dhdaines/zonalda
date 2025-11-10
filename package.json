@@ -22,7 +22,7 @@
     "typescript": "^5.5.3"
   },
   "dependencies": {
-    "@geoapify/geocoder-autocomplete": "^2.0.1",
+    "@geoapify/geocoder-autocomplete": "^3.0.0",
     "@types/geojson": "^7946.0.16",
     "ol": "latest"
   }
