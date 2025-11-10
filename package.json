@@ -23,7 +23,7 @@
   },
   "dependencies": {
     "@geoapify/geocoder-autocomplete": "^2.0.1",
-    "@types/geojson": "^7946.0.14",
+    "@types/geojson": "^7946.0.16",
     "ol": "latest"
   }
 }
