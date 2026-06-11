@@ -1,6 +1,6 @@
 {
   "name": "zonalda",
-  "version": "0.0.2",
+  "version": "0.2.0",
   "description": "ZOnage AdéLois Démontré aux Adélois.e.s",
   "scripts": {
     "start": "vite",
@@ -9,14 +9,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/dhdaines/zonalda.git"
+    "url": "git+https://git.ecolingui.ca/dhdaines/zonalda.git"
   },
   "author": "David Huggins-Daines <district6@vdsa.ca>",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/dhdaines/zonalda/issues"
+    "url": "https://git.ecolingui.ca/dhdaines/zonalda/issues"
   },
-  "homepage": "https://github.com/dhdaines/zonalda#readme",
+  "homepage": "https://git.ecolingui.ca/dhdaines/zonalda#readme",
   "devDependencies": {
     "typescript": "^5.5.3",
     "vite": "^8.0.16"
