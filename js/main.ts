@@ -1,22 +1,22 @@
 import { Map, View } from "ol";
 import VectorSource from "ol/source/Vector.js";
-import { Tile as TileLayer, Vector as VectorLayer } from "ol/layer.js";
-import OSM from "ol/source/OSM";
+import { Vector as VectorLayer } from "ol/layer.js";
 import { fromLonLat, toLonLat } from "ol/proj.js";
-import { ZONALDA_API_URL, ALEXI_URL, COLLECTES_URL, COLLECTE_ZONE_URL } from "./config";
+import { ZONALDA_API_URL, ALEXI_URL, COLLECTES_URL, COLLECTE_ZONE_URL } from "./config.js";
 import { GeocoderAutocomplete } from '@geoapify/geocoder-autocomplete';
 import { Feature as GeoJSONFeature, Point as GeoJSONPoint, Position as GeoJSONPosition } from "geojson";
-import { circular } from "ol/geom/Polygon";
-import GeoJSON from "ol/format/GeoJSON";
-import Feature, { FeatureLike } from "ol/Feature";
-import Point from "ol/geom/Point";
+import { circular } from "ol/geom/Polygon.js";
+import GeoJSON from "ol/format/GeoJSON.js";
+import Feature from "ol/Feature.js";
+import Point from "ol/geom/Point.js";
+import LayerGroup from "ol/layer/Group.js";
+import { apply } from "ol-mapbox-style";
 
 const sainteAdeleLonLat = [-74.13575955519771, 45.95173098477338];
 const sainteAdeleBBox = [-74.24500706506886, 45.91083041569574, -73.97918840416655, 46.03278941847226];
 
-const tile = new TileLayer({
-  source: new OSM(),
-});
+const tile = new LayerGroup();
+apply(tile, "https://tiles.openfreemap.org/styles/liberty");
 const source = new VectorSource<Feature>({
   features: [
     new Feature(new Point(fromLonLat(sainteAdeleLonLat))),
