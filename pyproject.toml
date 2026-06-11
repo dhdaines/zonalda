@@ -1,6 +1,53 @@
+[project]
+name = "zonalda"
+dynamic = ["version"]
+authors = [
+    { name = "David Huggins-Daines", email = "dhd@ecolingui.ca" },
+]
+description = "ZOnage AdéLois Démystifié pour les Adélois.e.s"
+readme = "README.md"
+license = "MIT"
+dependencies = [
+    "python-dotenv",
+    "geopandas",
+    "fastapi[standard]",
+    "httpx",
+]
+
+[project.scripts]
+zonalda = "zonalda:main"
+
 [build-system]
-requires = ["setuptools"]
+requires = ["setuptools>61", "setuptools-scm>=8"]
 build-backend = "setuptools.build_meta"
+
+[tool.setuptools]
+packages = [ "zonalda" ]
 
 [tool.pytest.ini_options]
 testpaths = ["test"]
+
+[tool.setuptools_scm]
+version_file = "zonalda/_version.py"
+
+[tool.hatch.envs.default]
+dependencies = [
+    "python-lsp-black",
+    "isort",
+    "flake8",
+    "flake8-bugbear",
+    "mypy",
+    "pytest",
+]
+
+[tool.hatch.envs.default.scripts]
+serve = "DEVELOPMENT=1 fastapi dev --port 5010 zonalda/api.py"
+
+[tool.hatch.envs.prod]
+dependencies = [
+    "gunicorn",
+    "uvicorn[standard]",
+]
+
+[tool.hatch.envs.prod.scripts]
+serve = "gunicorn -w 4 -k uvicorn.workers.UvicornWorker zonalda.api:app --bind 127.0.0.1:5010"

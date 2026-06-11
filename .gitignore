@@ -6,3 +6,4 @@ ZONALDA.ipynb
 __pycache__
 /node_modules
 .env
+/zonalda/_version.py

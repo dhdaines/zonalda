@@ -12,7 +12,8 @@ import geopandas  # type: ignore
 from pandas import Series
 from shapely import Point  # type: ignore
 
-VERSION = "0.0.2"
+from zonalda._version import __version__ as VERSION
+
 THISDIR = Path(__file__).parent
 LOGGER = logging.getLogger("zonalda")
 
