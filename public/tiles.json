@@ -1,0 +1,240 @@
+{
+  "tilejson": "3.0.0",
+  "tiles": [
+      "/tiles/{z}/{x}/{y}.pbf"
+  ],
+  "vector_layers": [
+    {
+      "id": "boundary",
+      "fields": {
+        "admin_level": "Number",
+        "disputed": "Number",
+        "maritime": "Number"
+      },
+      "minzoom": 0,
+      "maxzoom": 14
+    },
+    {
+      "id": "building",
+      "fields": {
+        "render_height": "Number",
+        "render_min_height": "Number"
+      },
+      "minzoom": 13,
+      "maxzoom": 14
+    },
+    {
+      "id": "housenumber",
+      "fields": {
+        "housenumber": "String"
+      },
+      "minzoom": 14,
+      "maxzoom": 14
+    },
+    {
+      "id": "landcover",
+      "fields": {
+        "class": "String",
+        "subclass": "String"
+      },
+      "minzoom": 7,
+      "maxzoom": 14
+    },
+    {
+      "id": "landuse",
+      "fields": {
+        "class": "String"
+      },
+      "minzoom": 5,
+      "maxzoom": 14
+    },
+    {
+      "id": "mountain_peak",
+      "fields": {
+        "class": "String",
+        "ele": "Number",
+        "ele_ft": "Number",
+        "name": "String",
+        "name:en": "String",
+        "name:fr": "String",
+        "name:latin": "String",
+        "name:nl": "String",
+        "name:pl": "String",
+        "name:sv": "String",
+        "name_de": "String",
+        "name_en": "String",
+        "name_int": "String",
+        "rank": "Number"
+      },
+      "minzoom": 7,
+      "maxzoom": 14
+    },
+    {
+      "id": "park",
+      "fields": {
+        "class": "String",
+        "name": "String",
+        "name:fr": "String",
+        "name:latin": "String",
+        "name_de": "String",
+        "name_en": "String",
+        "name_int": "String",
+        "rank": "Number"
+      },
+      "minzoom": 6,
+      "maxzoom": 14
+    },
+    {
+      "id": "place",
+      "fields": {
+        "class": "String",
+        "name": "String",
+        "name:ar": "String",
+        "name:de": "String",
+        "name:el": "String",
+        "name:en": "String",
+        "name:es": "String",
+        "name:et": "String",
+        "name:eu": "String",
+        "name:fa": "String",
+        "name:fr": "String",
+        "name:it": "String",
+        "name:ja": "String",
+        "name:latin": "String",
+        "name:nl": "String",
+        "name:pl": "String",
+        "name:pt": "String",
+        "name:sl": "String",
+        "name:sr": "String",
+        "name:sv": "String",
+        "name:tr": "String",
+        "name:ur": "String",
+        "name:zh": "String",
+        "name_de": "String",
+        "name_en": "String",
+        "name_int": "String",
+        "rank": "Number"
+      },
+      "minzoom": 7,
+      "maxzoom": 14
+    },
+    {
+      "id": "poi",
+      "fields": {
+        "class": "String",
+        "layer": "Number",
+        "name": "String",
+        "name:en": "String",
+        "name:fr": "String",
+        "name:latin": "String",
+        "name_de": "String",
+        "name_en": "String",
+        "name_int": "String",
+        "rank": "Number",
+        "subclass": "String"
+      },
+      "minzoom": 14,
+      "maxzoom": 14
+    },
+    {
+      "id": "transportation",
+      "fields": {
+        "access": "String",
+        "bicycle": "String",
+        "brunnel": "String",
+        "class": "String",
+        "foot": "String",
+        "horse": "String",
+        "layer": "Number",
+        "mtb_scale": "String",
+        "network": "String",
+        "official": "Number",
+        "oneway": "Number",
+        "ramp": "Number",
+        "service": "String",
+        "subclass": "String",
+        "surface": "String"
+      },
+      "minzoom": 4,
+      "maxzoom": 14
+    },
+    {
+      "id": "transportation_name",
+      "fields": {
+        "class": "String",
+        "layer": "Number",
+        "name": "String",
+        "name:latin": "String",
+        "name_de": "String",
+        "name_en": "String",
+        "name_int": "String",
+        "network": "String",
+        "ref": "String",
+        "ref_length": "Number",
+        "route_1_name": "String",
+        "route_1_network": "String",
+        "route_1_ref": "String",
+        "subclass": "String"
+      },
+      "minzoom": 8,
+      "maxzoom": 14
+    },
+    {
+      "id": "water",
+      "fields": {
+        "class": "String",
+        "id": "Number",
+        "intermittent": "Number"
+      },
+      "minzoom": 0,
+      "maxzoom": 14
+    },
+    {
+      "id": "water_name",
+      "fields": {
+        "class": "String",
+        "intermittent": "Number",
+        "name": "String",
+        "name:latin": "String",
+        "name_de": "String",
+        "name_en": "String",
+        "name_int": "String"
+      },
+      "minzoom": 14,
+      "maxzoom": 14
+    },
+    {
+      "id": "waterway",
+      "fields": {
+        "brunnel": "String",
+        "class": "String",
+        "intermittent": "Number",
+        "name": "String",
+        "name:en": "String",
+        "name:fr": "String",
+        "name:latin": "String",
+        "name:nl": "String",
+        "name:sv": "String",
+        "name_de": "String",
+        "name_en": "String",
+        "name_int": "String"
+      },
+      "minzoom": 9,
+      "maxzoom": 14
+    }
+  ],
+  "attribution": "<a href=\"https://www.openstreetmap.org/copyright\" target=\"_blank\">&copy; OpenStreetMap contributors</a>",
+  "bounds": [
+    -74.24501,
+    45.91084,
+    -73.97919,
+    46.0328
+  ],
+  "center": [
+    -74.1121,
+    45.97182,
+    11.0
+  ],
+  "minzoom": 0,
+  "maxzoom": 14
+}

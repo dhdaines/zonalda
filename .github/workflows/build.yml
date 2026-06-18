@@ -32,7 +32,10 @@ jobs:
       - name: Install Dependencies
         run: npm ci
       - name: Build
-        run: npx vite build --base=/zonalda/
+        run: |
+            npx vite build --base=/zonalda/
+            # Manually frob tiles.json (WTF)
+            perl -i -pe s,/tiles,/zonalda/tiles, dist/tiles.json
       - name: Setup Pages
         uses: actions/configure-pages@v5
       - name: Upload artifact

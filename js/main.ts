@@ -11,12 +11,23 @@ import Feature from "ol/Feature.js";
 import Point from "ol/geom/Point.js";
 import LayerGroup from "ol/layer/Group.js";
 import { apply } from "ol-mapbox-style";
+// @ts-ignore
+import styleJson from "./style.json";
 
 const sainteAdeleLonLat = [-74.13575955519771, 45.95173098477338];
 const sainteAdeleBBox = [-74.24500706506886, 45.91083041569574, -73.97918840416655, 46.03278941847226];
 
 const tile = new LayerGroup();
-apply(tile, "https://tiles.openfreemap.org/styles/liberty");
+// Update paths in style file (have to frob TileJSON manually because
+// Vite is incomprehensible and can't do this incredibly simple
+// transformation to static files, seriously, WTF...)
+styleJson.sources.openmaptiles = {
+    type: "vector",
+    url: `${import.meta.env.BASE_URL}tiles.json`,
+}
+styleJson.glyphs = import.meta.env.BASE_URL + styleJson.glyphs;
+apply(tile, styleJson);
+
 const source = new VectorSource<Feature>({
   features: [
     new Feature(new Point(fromLonLat(sainteAdeleLonLat))),
